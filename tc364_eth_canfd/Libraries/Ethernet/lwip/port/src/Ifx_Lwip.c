@@ -418,6 +418,47 @@ void Ifx_Lwip_init(eth_addr_t ethAddr)
     LWIP_DEBUGF(IFX_LWIP_DEBUG, ("Ifx_Lwip_init end!\n"));
 }
 
+void Ifx_Lwip_Reinit(eth_addr_t ethAddr, ip_addr_t *ipaddr, ip_addr_t *netmask, ip_addr_t *gw)
+{
+#ifdef __LWIP_DEBUG__
+    //Init uart for debugging
+    initUART();
+#endif
+    // ip_addr_t default_ipaddr, default_netmask, default_gw;
+    // IP4_ADDR(&default_gw, 0,0,0,0);
+    // IP4_ADDR(&default_ipaddr, 0,0,0,0);
+    // IP4_ADDR(&default_netmask, 255,0,0,0);
+
+    LWIP_DEBUGF(IFX_LWIP_DEBUG, ("Ifx_Lwip_init start!\n"));
+
+    /** - initialise LWIP (lwip_init()) */
+    lwip_init();
+
+    /** - initialise and add a \ref netif */
+    g_Lwip.eth_addr = ethAddr;
+    netif_add(&g_Lwip.netif, ipaddr, netmask, gw,
+        (void *)0, ifx_netif_init, ethernet_input);
+    netif_set_default(&g_Lwip.netif);
+    netif_set_up(&g_Lwip.netif);
+
+#if LWIP_NETIF_HOSTNAME
+    g_Lwip.netif.hostname = BOARDNAME;
+#endif
+
+#if LWIP_DHCP
+    /** - assign \ref dhcp to \ref netif */
+    dhcp_set_struct(&g_Lwip.netif, &g_Lwip.dhcp);
+
+    /* we start the dhcp always here also when we don't have a link here */
+    dhcp_start(&g_Lwip.netif);
+#endif
+
+#if LWIP_NETIF_EXT_STATUS_CALLBACK
+    netif_add_ext_callback(&g_extCallback, netif_state_changed);
+#endif
+    LWIP_DEBUGF(IFX_LWIP_DEBUG, ("Ifx_Lwip_init end!\n"));
+}
+
 /** Returns the current time in milliseconds,
  * may be the same as sys_jiffies or at least based on it. */
 inline u32_t sys_now(void)
@@ -495,4 +536,3 @@ s8_t Ifx_Lwip_printf(const char *format, ...)
 #pragma ghs section data=default
 #pragma ghs section bss=default
 #endif
-

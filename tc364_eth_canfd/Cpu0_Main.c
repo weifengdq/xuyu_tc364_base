@@ -28,6 +28,9 @@
 #include "IfxCpu.h"
 #include "IfxScuWdt.h"
 
+#include "bsp_eth.h"
+#include "bsp_timer.h"
+
 IFX_ALIGN(4) IfxCpu_syncEvent g_cpuSyncEvent = 0;
 
 void core0_main(void)
@@ -43,9 +46,13 @@ void core0_main(void)
     /* Wait for CPU sync event */
     IfxCpu_emitEvent(&g_cpuSyncEvent);
     IfxCpu_waitEvent(&g_cpuSyncEvent, 1);
+
+    stm0_init();
+    delay_ms(200);
+    eth_init();
     
     while(1)
     {
+        eth_process();
     }
 }
-

@@ -142,6 +142,7 @@ IFX_EXTERN uint8 channel0RxBuffer1[IFXGETH_MAX_RX_DESCRIPTORS][IFXGETH_MAX_RX_BU
 /** \addtogroup lib_lwIP
  * \{ */
 IFX_EXTERN void     Ifx_Lwip_init(eth_addr_t ethAddr);
+IFX_EXTERN void     Ifx_Lwip_Reinit(eth_addr_t ethAddr, ip_addr_t *ipaddr, ip_addr_t *netmask, ip_addr_t *gw);
 IFX_EXTERN void     Ifx_Lwip_onTimerTick(void);
 IFX_EXTERN void     Ifx_Lwip_pollTimerFlags(void);
 IFX_EXTERN void     Ifx_Lwip_pollReceiveFlags(void);
